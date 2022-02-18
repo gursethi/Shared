@@ -1,6 +1,14 @@
 # DELTA LIVE TABLE - SQL Example
 
-This project is to demonstrate Databricks' Delta Live Table functionality using Structured Query Lanugage and CSV sample dataset. This example demonstrates how Delta Live Table can be used to build Medalian architecture (Bronze, Silver and Gold), how to perform Data Quality Checks as part of the Delta Live Table pipeline and how to query results using Databricks SQL Query. Also this example will demonstrate how to pass parameters to the DELTA LIVE TABLE Job and use Delta's Time Travel Feature.
+This project is to demonstrate Databricks' Delta Live Table functionality using Structured Query Language and CSV sample dataset. This example demonstrates, how to :
+
+* Build Medallion architecture (Bronze, Silver and Gold) using Databricks Delta Live Tables
+* Build Delta Live Table pipeline
+    * Pass parameters to pipeline
+    * Perform Data Quality Checks
+* Access data using Databricks SQL Query. 
+* Time Travel
+* Schema Evolution
 
 ## Initial Data Loading
 
@@ -18,27 +26,29 @@ c) emp_dept.csv
 ![image](https://user-images.githubusercontent.com/95003669/153998006-f0db0223-7ccb-4a63-b1e3-6b375a765f1c.png)
 
 
-**Step 2** **:** Pass the folder name in widget in which files were stored. This will then be used to defined full path for Landing and DLT in CMD 3.
+**Step 2** **:** Open "01_Load_Data.py" and pass the folder name in widget in which files were stored. This will then be used to define full path for Landing and DLT in CMD 3.
 
 ![image](https://user-images.githubusercontent.com/95003669/153994838-5ff13532-2b77-4420-8f6e-8ba8f329e92c.png)
 
 
-**Step 3** **:** Run **CMD 5** , **CMD 7** , **CMD 9** to see if we are able to successfully read the files.
+**Step 3** **:** Run CMD 5 , CMD 7 , CMD 9 from notebook "01_LoadData.py" to verify dataset to see if we are able to successfully read the files.
 
 ![image](https://user-images.githubusercontent.com/95003669/154378718-44ffbd90-84a2-4096-a039-d69795921989.png)
 
 
 ## Create Delta Live Job
 
-**Step 4** **:** Open "**02_SQLDLT**", in **CMD 1, 2 & 3** we can we have parameterise **foldername**, which means at run time we need to provide this value to construct full path to fecth data from.
+**Step 4** **:** Open "02_SQLDLT", in CMD 1, 2 & 3 we can we have parameterise foldername, which means at run time we need to provide this value to construct full path to fetch data from.
 
 ![image](https://user-images.githubusercontent.com/95003669/154006177-be387cd3-4026-4491-be08-8736ce6e9c91.png)
 
-**Step 5** **:** Open **Jobs -> Select "Delta Live Tables (Preview) -> Create Pipeline** to create a new Delta Live Table Job using "**02_SQLDLT.sql**" notebook.
+**Step 5** **:** Open Jobs -> Select "Delta Live Tables (Preview) -> Create Pipeline to create a new Delta Live Table Job using "02_SQLDLT.sql" notebook.
 
 ![image](https://user-images.githubusercontent.com/95003669/154007620-0d272952-307f-4b8d-a10c-479a111fbb90.png)
 
-**Step 6** **:** Once Create Pipeline window opens, provide below information:
+**Pass Parameters to Delta Live Pipeline
+
+****Step 6** **:** Once Create Pipeline window opens, provide below information:
 
 1) Pipeline Name - Name with which we would like to recognize/save this pipeline
 2) Notebook Libararies - Location of the **02_SQLDLT.sql** notebook
@@ -50,9 +60,10 @@ c) emp_dept.csv
 
 ![image](https://user-images.githubusercontent.com/95003669/154009166-90348688-d3ff-4371-87ad-d5681913b12a.png)
 
-6) Click **Create** and we can see a screen like below. This is because we just created a pipeline and have not executed yet. Click on **Start** and let the job finish. This may take 3-5 minutes as during this time Databrick SQL will allocate resources for running job and also create database, tables and then execute delta live table notebook. 
+6) Click **Create**. Once done we can see a screen like below. This is because we just created a pipeline and have not executed it yet. Click on **Start** and let the job finish. This may take 3-5 minutes as during this time Databrick SQL will allocate resources for running job and also create database, tables and then execute delta live table notebook. 
 
 ![image](https://user-images.githubusercontent.com/95003669/154189583-50096727-b1ee-4484-9dc7-93da85139fd5.png)
+
 
 7) Once, finished successfully, we can see a Data Lineage Graph and other information like number of records processed, time-took at each step etc.. else troubleshoot errors (should not be the case :).
 
@@ -60,7 +71,7 @@ c) emp_dept.csv
 
 ## Explore Data using Databricks SQL
 
-**Step 7** **:** Open "**SQL**" panel from left hand side menu, click **SQL Editor**, in Schema Browser -> hive)metastore -> <Database Name> (Target Name which we have in Step 6 - Point 4 above) and we shall see list of tables (Bronze, Silver and Gold).
+**Step 7** **:** Open "**SQL**" panel from left hand side menu, click **SQL Editor**, in Schema Browser -> hive metastore -> Database (Target Name which we have in Step 6 - Point 4 above) and we shall see list of tables (Bronze, Silver and Gold).
 
 ![image](https://user-images.githubusercontent.com/95003669/154006681-ddfbdf6c-4bfe-4b4d-9311-5eae94e77196.png)
 
@@ -101,7 +112,7 @@ c) emp_dept.csv
 ![image](https://user-images.githubusercontent.com/95003669/154379668-56f611e2-f0d3-461f-b7ee-ebc43e991f4a.png)
 
 ## Incremental Load
-**Step 8** **:** Upload "**employee_2.csv**" file from SampleData folder of this repository and run **CMD 11** to verify dataset. We can see we have:
+**Step 8** **:** Upload "**employee_2.csv**" file from SampleData folder of this repository and run **CMD 11** from notebook "**01_LoadData.py**"to verify dataset. We can see we have:
     2 UPDATES for EMP_ID = 1 (Age -1 to 44 and Emp_LastName Null to Horton), 3 (Changed Emp_LastName (smith to Smith) 
     1 INSERT for EMP_ID = 4 
 
@@ -144,7 +155,7 @@ Lets run the Delta Live Table Job and see how data will be processed and what re
 ![image](https://user-images.githubusercontent.com/95003669/154382517-ebce73e2-2472-4a36-9ca2-084518c9427b.png)
 
 
-## DELTA TIME TRAVEL
+## TIME TRAVEL
 Now, lets see how we can leverage DELTA TIME TRAVEL feature to see how changes have happened over the period of time. To do so we can use below synatx:
     
     DESCRIBE HISTORY <Databasename.TableName>
@@ -198,6 +209,35 @@ We can either use **VERSION AS OF <version>** or **TIMESTAMP AS OF <timestamp>**
 **Timestamp as of 2022-02-16 03:21:25**
 ![image](https://user-images.githubusercontent.com/95003669/154384180-84cd3227-63a8-402a-802b-92c575d11b9b.png)
 
+## Schema Evolution
+Delta Live Table, as it uses Autoloader under the hood hence it has Schema Evolution capability built into it. Later if our underlying schema for a given entity changes, Delta Live Table will Infer Schema and Evolve it automatically. Let see it in action.
+
+**Step 11** Upload "**employee_3_newschema.csv**" file from SampleData folder of this repository and run **CMD 13** from notebook "**01_LoadData.py**" to verify dataset. We can see we have, all existing 4 records but this time we a new column added "**Salutation**" with default value as "**Mr**".   
+
+![image](https://user-images.githubusercontent.com/95003669/154622610-fe730db2-47f8-4920-ab8d-7380e8fa7aab.png)
+
+**Step 12** Let us execute Delta Live Table job. Once we execute it, we will see a warning message complaining about Schema Change. At this step job will fail but then will automatically restart itself and next run it will succeed successfully.
+    
+![image](https://user-images.githubusercontent.com/95003669/154622660-a2f2cb4f-bcf6-4ee0-9e6a-94f5399e5455.png)
+
+Next, post auto-restart, job will complete successfully so lets check the records.
+
+**Bronze**
+**employee_raw**, we have around 10 records and they are from all 3 files. Old records have Salutation column as NULL.
+
+![image](https://user-images.githubusercontent.com/95003669/154622771-b45be527-94cc-4f5f-b385-2e4341031b34.png)
+
+**Silver** 
+**employee_raw**, We have 9 records in total. Reason - because during initial run EMP_ID = 1 record got dropped by data quality checks i.e. Age >0 as Age was -1. As we can see in below screenshot, we have complete history of records available.
+
+![image](https://user-images.githubusercontent.com/95003669/154622860-c967f60a-f6ef-445e-b21f-2edec3ba4017.png)
+
+**Gold**
+**employee_master**, we can see nothing has changed, as Gold table is a detailed query which selectively fetches columns. If we want to move this new column to Gold, then we have to revise the logic for Gold table. **Test it yourself :)**
+    
+![image](https://user-images.githubusercontent.com/95003669/154622974-373ec204-2b7f-421b-b543-f00f26928c61.png)
+
+    
 ## More on Delta Live Table
 https://docs.microsoft.com/en-us/azure/databricks/data-engineering/delta-live-tables/
     
